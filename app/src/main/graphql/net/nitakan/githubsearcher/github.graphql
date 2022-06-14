@@ -1,0 +1,108 @@
+query SearchGitHubRepository($query: String!, $limit: Int!, $after: String) {
+  search(query: $query, type: REPOSITORY, first: $limit, after: $after) {
+    repositoryCount
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+    nodes {
+      ...GitHubRepositoryListItemFragment
+    }
+  }
+}
+
+query GetGitHubRepository($repositoryName: String!, $ownerName: String!) {
+  repository(name: $repositoryName, owner: $ownerName) {
+    ...GitHubRepositoryListItemFragment
+    issues(first: 0) {
+      totalCount
+    }
+    watchers {
+      totalCount
+    }
+    pullRequests {
+      totalCount
+    }
+    homepageUrl
+    projects {
+      totalCount
+    }
+    releases(orderBy: {field: CREATED_AT, direction: DESC}, first: 1) {
+      totalCount
+      nodes {
+        description
+        name
+        publishedAt
+        tagName
+        url
+      }
+    }
+    discussions {
+      totalCount
+    }
+
+    licenseInfo {
+      url
+      name
+      nickname
+    }
+    repositoryTopics(first: 50) {
+      totalCount
+      nodes {
+        id
+        resourcePath
+        url
+        topic {
+          name
+          stargazerCount
+          viewerHasStarred
+        }
+      }
+    }
+  }
+}
+
+fragment GitHubRepositoryListItemFragment on Repository {
+  id
+  name
+  description
+  createdAt
+  updatedAt
+  url
+  forkCount
+  stargazerCount
+  viewerHasStarred
+  viewerSubscription
+  owner {
+    id
+    avatarUrl(size: 48)
+    login
+    url
+  }
+  languages(first: 5) {
+    nodes {
+      color
+      id
+      name
+    }
+  }
+}
+
+mutation AddStar($id: ID!){
+  addStar(input: { starrableId: $id }) {
+    clientMutationId
+  }
+}
+
+mutation UpdateSubscription($id: ID!, $state: SubscriptionState!) {
+  updateSubscription(input: {subscribableId: $id, state: $state}) {
+    clientMutationId
+  }
+}
+
+
+mutation RemoveStar($id: ID!){
+  removeStar(input: { starrableId: $id }) {
+    clientMutationId
+  }
+}
